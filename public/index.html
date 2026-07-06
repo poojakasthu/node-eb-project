@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TravelGo - Travel Booking Portal</title>
+
+<title>TravelGo | Smart Travel Booking</title>
 
 <link rel="stylesheet" href="css/style.css">
 
@@ -11,233 +15,299 @@
 
 <body>
 
+<!-- Navigation -->
+
 <header>
 
 <div class="logo">
+
 🌍 TravelGo
+
 </div>
 
 <nav>
 
-<a href="#">Home</a>
-<a href="#packages">Packages</a>
+<a href="#home">Home</a>
+
+<a href="#destinations">Destinations</a>
+
 <a href="#booking">Book Trip</a>
-<a href="#dashboard">Dashboard</a>
+
+<a href="#reviews">Reviews</a>
+
+<a href="#contact">Contact</a>
+
+<a href="/login" class="login-btn">Admin Login</a>
 
 </nav>
 
 </header>
 
-<section class="hero">
+<!-- Hero -->
 
-<h1>Explore the World With TravelGo ✈️</h1>
+<section class="hero" id="home">
+
+<h1>Explore The World With TravelGo</h1>
 
 <p>
-Book your dream vacation in just a few clicks.
+
+Book Domestic & International Tour Packages Easily
+
 </p>
 
 <button onclick="document.getElementById('booking').scrollIntoView()">
+
 Book Now
+
 </button>
 
 </section>
 
-<section id="packages">
+<!-- Search -->
+
+<section class="search-section">
+
+<h2>Search Destination</h2>
+
+<input
+
+type="text"
+
+id="searchDestination"
+
+placeholder="Search destination..."
+
+onkeyup="searchDestination()"
+
+>
+
+</section>
+
+<!-- Destinations -->
+
+<section id="destinations">
 
 <h2 class="section-title">
+
 Popular Destinations
+
 </h2>
 
-<div class="card-container">
+<div id="destinationContainer"
 
-<div class="card">
-
-<img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500">
-
-<h3>Goa</h3>
-
-<p>₹8,999</p>
-
-<button onclick="selectDestination('Goa')">
-Book
-</button>
-
-</div>
-
-<div class="card">
-
-<img src="https://images.unsplash.com/photo-1518684079-3c830dcef090?w=500">
-
-<h3>Kerala</h3>
-
-<p>₹12,499</p>
-
-<button onclick="selectDestination('Kerala')">
-Book
-</button>
-
-</div>
-
-<div class="card">
-
-<img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500">
-
-<h3>Manali</h3>
-
-<p>₹10,999</p>
-
-<button onclick="selectDestination('Manali')">
-Book
-</button>
-
-</div>
-
-<div class="card">
-
-<img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500">
-
-<h3>Dubai</h3>
-
-<p>₹54,999</p>
-
-<button onclick="selectDestination('Dubai')">
-Book
-</button>
-
-</div>
+class="card-container">
 
 </div>
 
 </section>
+
+<!-- Booking -->
 
 <section id="booking">
 
 <h2 class="section-title">
+
 Book Your Trip
+
 </h2>
 
 <form id="bookingForm">
 
 <input
+
 type="text"
-placeholder="Full Name"
-id="name"
-required>
+
+id="customerName"
+
+placeholder="Customer Name"
+
+required
+
+>
 
 <input
+
+type="email"
+
+id="email"
+
+placeholder="Email"
+
+required
+
+>
+
+<input
+
 type="text"
-placeholder="Phone Number"
+
 id="phone"
-required>
+
+placeholder="Phone Number"
+
+required
+
+>
 
 <select id="destination">
 
-<option value="">Choose Destination</option>
+<option value="Goa">
 
-<option>Goa</option>
-<option>Kerala</option>
-<option>Manali</option>
-<option>Dubai</option>
+Goa
+
+</option>
+
+<option value="Kerala">
+
+Kerala
+
+</option>
+
+<option value="Manali">
+
+Manali
+
+</option>
+
+<option value="Dubai">
+
+Dubai
+
+</option>
 
 </select>
 
 <input
+
 type="number"
-placeholder="Travellers"
+
 id="travellers"
-min="1"
-required>
+
+placeholder="Travellers"
+
+required
+
+>
 
 <input
-type="date"
-id="travelDate"
-required>
+
+type="number"
+
+id="amount"
+
+placeholder="Amount"
+
+required
+
+>
 
 <button type="submit">
-Confirm Booking
+
+Continue To Payment
+
 </button>
 
 </form>
 
-<div id="message"></div>
+</section>
+
+<!-- Favourite -->
+
+<section>
+
+<h2 class="section-title">
+
+❤️ Favourite Packages
+
+</h2>
+
+<div
+
+id="favouriteContainer"
+
+class="card-container">
+
+</div>
 
 </section>
 
-<section id="dashboard">
+<!-- Reviews -->
+
+<section id="reviews">
 
 <h2 class="section-title">
-Dashboard
+
+Customer Reviews
+
 </h2>
 
-<div class="stats">
+<div
 
-<div class="stat-card">
+id="reviewContainer"
 
-<h3 id="totalBookings">0</h3>
-
-<p>Total Bookings</p>
+class="review-container">
 
 </div>
 
-<div class="stat-card">
+</section>
 
-<h3 id="confirmed">0</h3>
+<!-- Contact -->
 
-<p>Confirmed</p>
-
-</div>
-
-<div class="stat-card">
-
-<h3 id="cancelled">0</h3>
-
-<p>Cancelled</p>
-
-</div>
-
-</div>
+<section id="contact">
 
 <h2 class="section-title">
-Booking List
+
+Contact Us
+
 </h2>
+
+<form id="contactForm">
 
 <input
+
 type="text"
-id="search"
-placeholder="Search Customer..."
-onkeyup="searchBookings()">
 
-<table>
+id="contactName"
 
-<thead>
+placeholder="Your Name"
 
-<tr>
+required
 
-<th>ID</th>
+>
 
-<th>Name</th>
+<input
 
-<th>Destination</th>
+type="email"
 
-<th>Travellers</th>
+id="contactEmail"
 
-<th>Date</th>
+placeholder="Email"
 
-<th>Status</th>
+required
 
-<th>Action</th>
+>
 
-</tr>
+<textarea
 
-</thead>
+id="contactMessage"
 
-<tbody id="bookingTable">
+placeholder="Message"
 
-</tbody>
+required
 
-</table>
+></textarea>
+
+<button type="submit">
+
+Send Message
+
+</button>
+
+</form>
 
 </section>
+
+<!-- Footer -->
 
 <footer>
 
@@ -245,7 +315,9 @@ onkeyup="searchBookings()">
 
 © 2026 TravelGo
 
-Powered by Node.js | AWS Elastic Beanstalk
+|
+
+AWS Elastic Beanstalk Deployment
 
 </p>
 
@@ -254,4 +326,5 @@ Powered by Node.js | AWS Elastic Beanstalk
 <script src="js/script.js"></script>
 
 </body>
+
 </html>
