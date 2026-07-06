@@ -1,72 +1,139 @@
-const loginForm = document.getElementById("loginForm");
+// =====================================
+// TravelGo Login
+// =====================================
 
-loginForm.addEventListener("submit", async function (e) {
+const loginForm = document.getElementById("loginForm");
+const loginBtn = document.getElementById("loginBtn");
+const message = document.getElementById("loginMessage");
+
+loginForm.addEventListener("submit", login);
+
+async function login(e) {
 
     e.preventDefault();
 
-    const username = document.getElementById("username").value.trim();
+    const username = document
+        .getElementById("username")
+        .value
+        .trim();
 
-    const password = document.getElementById("password").value.trim();
+    const password = document
+        .getElementById("password")
+        .value
+        .trim();
 
-    const message = document.getElementById("loginMessage");
+    if (username === "" || password === "") {
 
-    if (!username || !password) {
-
-        message.style.color = "red";
-        message.innerHTML = "Please enter username and password.";
+        showMessage("Please enter username and password.", "red");
 
         return;
 
     }
 
+    loginBtn.disabled = true;
+
+    loginBtn.innerHTML = "Logging in...";
+
     try {
 
-        const response = await fetch("/login", {
+        const response = await fetch("/api/login", {
 
             method: "POST",
 
             headers: {
+
                 "Content-Type": "application/json"
+
             },
 
             body: JSON.stringify({
+
                 username,
+
                 password
+
             })
 
         });
 
         const data = await response.json();
 
-        if (data.success) {
+        if (response.ok && data.success) {
 
-            message.style.color = "green";
-            message.innerHTML = "✅ Login Successful...";
+            showMessage("✅ Login Successful", "green");
+
+            showToast("Welcome Administrator");
 
             setTimeout(() => {
 
                 window.location.href = "/dashboard";
 
-            }, 1000);
+            }, 1200);
 
         }
 
         else {
 
-            message.style.color = "red";
-            message.innerHTML = data.message;
+            showMessage(
+
+                data.message || "Invalid Username or Password",
+
+                "red"
+
+            );
 
         }
 
     }
 
-    catch (err) {
+    catch (error) {
 
-        message.style.color = "red";
-        message.innerHTML = "Server Error.";
+        console.error(error);
 
-        console.error(err);
+        showMessage("Server Error. Please try again.", "red");
 
     }
 
-});
+    finally {
+
+        loginBtn.disabled = false;
+
+        loginBtn.innerHTML = "Login";
+
+    }
+
+}
+
+// =====================================
+// Message
+// =====================================
+
+function showMessage(text, color) {
+
+    message.style.color = color;
+
+    message.innerHTML = text;
+
+}
+
+// =====================================
+// Toast Notification
+// =====================================
+
+function showToast(text) {
+
+    let toast = document.getElementById("toast");
+
+    if (!toast) return;
+
+    toast.innerHTML = text;
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 3000);
+
+}
