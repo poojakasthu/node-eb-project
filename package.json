@@ -1,7 +1,7 @@
 {
   "name": "node-eb-project",
-  "version": "2.0.0",
-  "description": "TravelGo - Travel Booking Portal deployed on AWS Elastic Beanstalk",
+  "version": "2.1.0",
+  "description": "TravelGo - Travel Booking Portal with Admin Login, Dashboard and AWS Elastic Beanstalk Deployment",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -14,7 +14,8 @@
     "booking",
     "aws",
     "elastic-beanstalk",
-    "cloud"
+    "dashboard",
+    "login"
   ],
   "author": "Pooja",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "express-session": "^1.18.0"
   }
 }
