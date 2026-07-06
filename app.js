@@ -7,11 +7,11 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-const DB_PATH = path.join(__dirname, "data", "database.json");
+const DB_FILE = path.join(__dirname, "data", "database.json");
 
-// -------------------------
+// ---------------------------
 // Middleware
-// -------------------------
+// ---------------------------
 
 app.use(express.json());
 
@@ -25,24 +25,26 @@ app.use(
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: 1000 * 60 * 60 // 1 Hour
+            maxAge: 1000 * 60 * 60
         }
     })
 );
 
-// -------------------------
+// ---------------------------
 // Database Functions
-// -------------------------
+// ---------------------------
 
-function readDatabase() {
+function readDB() {
 
-    if (!fs.existsSync(DB_PATH)) {
+    if (!fs.existsSync(DB_FILE)) {
 
         fs.writeFileSync(
-            DB_PATH,
+            DB_FILE,
             JSON.stringify(
                 {
-                    bookings: []
+                    bookings: [],
+                    reviews: [],
+                    destinations: []
                 },
                 null,
                 2
@@ -52,25 +54,25 @@ function readDatabase() {
     }
 
     return JSON.parse(
-        fs.readFileSync(DB_PATH)
+        fs.readFileSync(DB_FILE)
     );
 
 }
 
-function writeDatabase(data) {
+function writeDB(data) {
 
     fs.writeFileSync(
-        DB_PATH,
+        DB_FILE,
         JSON.stringify(data, null, 2)
     );
 
 }
 
-// -------------------------
+// ---------------------------
 // Authentication Middleware
-// -------------------------
+// ---------------------------
 
-function isAuthenticated(req, res, next) {
+function isLoggedIn(req, res, next) {
 
     if (req.session.loggedIn) {
 
@@ -78,143 +80,158 @@ function isAuthenticated(req, res, next) {
 
     }
 
-    return res.redirect("/login.html");
+    return res.status(401).json({
+        success: false,
+        message: "Unauthorized"
+    });
 
 }
+// ---------------------------
+// Pages
+// ---------------------------
 
-// -------------------------
-// Public Routes
-// -------------------------
-
-// Home Page
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+
+    res.sendFile(
+        path.join(__dirname, "public", "index.html")
+    );
+
 });
 
-// Login Page
 app.get("/login", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "login.html"));
+
+    res.sendFile(
+        path.join(__dirname, "public", "login.html")
+    );
+
 });
 
-// Dashboard Page (Protected)
-app.get("/dashboard", isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+app.get("/dashboard", (req, res) => {
+
+    if (!req.session.loggedIn) {
+
+        return res.redirect("/login");
+
+    }
+
+    res.sendFile(
+        path.join(__dirname, "public", "dashboard.html")
+    );
+
 });
 
-// -------------------------
+// ---------------------------
 // Authentication
-// -------------------------
+// ---------------------------
 
-app.post("/login", (req, res) => {
+app.post("/api/login", (req, res) => {
 
     const { username, password } = req.body;
 
-    // Demo Credentials
-    const ADMIN_USERNAME = "admin";
-    const ADMIN_PASSWORD = "admin123";
-
     if (
-        username === ADMIN_USERNAME &&
-        password === ADMIN_PASSWORD
+        username === "admin" &&
+        password === "admin123"
     ) {
 
         req.session.loggedIn = true;
 
         req.session.user = {
             username: "admin",
-            role: "Administrator",
-            loginTime: new Date().toLocaleString()
+            role: "Administrator"
         };
 
         return res.json({
-            success: true,
-            message: "Login Successful"
+            success: true
         });
 
     }
 
     res.status(401).json({
         success: false,
-        message: "Invalid Username or Password"
+        message: "Invalid Credentials"
     });
 
 });
 
-// Logout
-
-app.get("/logout", (req, res) => {
+app.get("/api/logout", (req, res) => {
 
     req.session.destroy(() => {
 
-        res.redirect("/login");
+        res.json({
+            success: true
+        });
 
     });
 
 });
 
-// Check Login Status
+app.get("/api/user", isLoggedIn, (req, res) => {
 
-app.get("/api/user", isAuthenticated, (req, res) => {
+    res.json(req.session.user);
 
-    res.json({
+    
+});
+// ---------------------------
+// Public APIs
+// ---------------------------
 
-        loggedIn: true,
+// Get All Destinations
 
-        user: req.session.user
+app.get("/api/destinations", (req, res) => {
 
-    });
+    const db = readDB();
+
+    res.json(db.destinations);
 
 });
 
-// -------------------------
-// Booking APIs (Protected)
-// -------------------------
+// Get Customer Reviews
 
-// Get All Bookings
-app.get("/api/bookings", isAuthenticated, (req, res) => {
+app.get("/api/reviews", (req, res) => {
 
-    const db = readDatabase();
+    const db = readDB();
 
-    res.json(db.bookings);
+    res.json(db.reviews);
 
 });
 
-// Add Booking
-app.post("/api/bookings", isAuthenticated, (req, res) => {
+// Create Booking (Public)
 
-    const db = readDatabase();
+app.post("/api/bookings", (req, res) => {
+
+    const db = readDB();
 
     const booking = {
 
         id: Date.now(),
 
-        name: req.body.name,
+        customerName: req.body.customerName,
 
         phone: req.body.phone,
 
+        email: req.body.email,
+
         destination: req.body.destination,
 
-        travellers: req.body.travellers,
+        travellers: Number(req.body.travellers),
 
-        travelDate: req.body.travelDate,
+        amount: Number(req.body.amount),
 
-        status: "Confirmed",
+        paymentStatus: "Pending",
 
-        amount: req.body.amount || 0,
+        bookingStatus: "Booked",
 
-        createdAt: new Date().toLocaleString()
+        bookedOn: new Date().toLocaleString()
 
     };
 
     db.bookings.push(booking);
 
-    writeDatabase(db);
+    writeDB(db);
 
     res.json({
 
         success: true,
-
-        message: "Booking Created Successfully",
 
         booking
 
@@ -222,132 +239,64 @@ app.post("/api/bookings", isAuthenticated, (req, res) => {
 
 });
 
-// Update Booking
-app.put("/api/bookings/:id", isAuthenticated, (req, res) => {
+// Get Latest Booking
 
-    const db = readDatabase();
+app.get("/api/bookings/latest", (req, res) => {
 
-    const booking = db.bookings.find(
-        b => b.id == req.params.id
-    );
+    const db = readDB();
 
-    if (!booking) {
+    if (db.bookings.length === 0) {
 
-        return res.status(404).json({
-
-            success: false,
-
-            message: "Booking Not Found"
-
-        });
+        return res.json(null);
 
     }
 
-    booking.name = req.body.name || booking.name;
+    res.json(
 
-    booking.phone = req.body.phone || booking.phone;
-
-    booking.destination =
-        req.body.destination || booking.destination;
-
-    booking.travellers =
-        req.body.travellers || booking.travellers;
-
-    booking.travelDate =
-        req.body.travelDate || booking.travelDate;
-
-    writeDatabase(db);
-
-    res.json({
-
-        success: true,
-
-        message: "Booking Updated"
-
-    });
-
-});
-
-// Cancel Booking
-app.patch("/api/bookings/:id/cancel", isAuthenticated, (req, res) => {
-
-    const db = readDatabase();
-
-    const booking = db.bookings.find(
-        b => b.id == req.params.id
-    );
-
-    if (!booking) {
-
-        return res.status(404).json({
-
-            success: false,
-
-            message: "Booking Not Found"
-
-        });
-
-    }
-
-    booking.status = "Cancelled";
-
-    writeDatabase(db);
-
-    res.json({
-
-        success: true,
-
-        message: "Booking Cancelled"
-
-    });
-
-});
-
-// Delete Booking
-app.delete("/api/bookings/:id", isAuthenticated, (req, res) => {
-
-    const db = readDatabase();
-
-    db.bookings = db.bookings.filter(
-
-        b => b.id != req.params.id
+        db.bookings[db.bookings.length - 1]
 
     );
 
-    writeDatabase(db);
+});
 
-    res.json({
 
-        success: true,
+// ---------------------------
+// Admin APIs
+// ---------------------------
 
-        message: "Booking Deleted"
+// All Bookings
 
-    });
+app.get("/api/admin/bookings", isLoggedIn, (req, res) => {
+
+    const db = readDB();
+
+    res.json(db.bookings);
 
 });
 
 // Dashboard Statistics
-app.get("/api/stats", isAuthenticated, (req, res) => {
 
-    const db = readDatabase();
+app.get("/api/admin/stats", isLoggedIn, (req, res) => {
+
+    const db = readDB();
 
     const totalBookings = db.bookings.length;
 
     const confirmed = db.bookings.filter(
 
-        b => b.status === "Confirmed"
+        b => b.bookingStatus === "Booked"
 
     ).length;
 
     const cancelled = db.bookings.filter(
 
-        b => b.status === "Cancelled"
+        b => b.bookingStatus === "Cancelled"
 
     ).length;
 
     const revenue = db.bookings.reduce(
 
-        (sum, booking) => sum + Number(booking.amount || 0),
+        (sum, b) => sum + Number(b.amount),
 
         0
 
@@ -367,41 +316,270 @@ app.get("/api/stats", isAuthenticated, (req, res) => {
 
 });
 
-// Recent Bookings
-app.get("/api/recent-bookings", isAuthenticated, (req, res) => {
 
-    const db = readDatabase();
+// Update Booking
 
-    const recent = [...db.bookings]
+app.put("/api/admin/bookings/:id", isLoggedIn, (req, res) => {
 
-        .reverse()
+    const db = readDB();
 
-        .slice(0, 5);
+    const booking = db.bookings.find(
 
-    res.json(recent);
+        b => b.id == req.params.id
 
-});
+    );
 
-// Health Check
-app.get("/health", (req, res) => {
+    if (!booking) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            message: "Booking Not Found"
+
+        });
+
+    }
+
+    booking.customerName = req.body.customerName;
+
+    booking.phone = req.body.phone;
+
+    booking.email = req.body.email;
+
+    booking.destination = req.body.destination;
+
+    booking.travellers = req.body.travellers;
+
+    booking.amount = req.body.amount;
+
+    writeDB(db);
 
     res.json({
 
-        status: "UP",
+        success: true,
 
-        application: "TravelGo",
-
-        version: "2.1.0",
-
-        timestamp: new Date()
+        message: "Booking Updated"
 
     });
 
 });
 
-// -------------------------
-// 404 Handler
-// -------------------------
+
+// Cancel Booking
+
+app.patch("/api/admin/bookings/:id/cancel", isLoggedIn, (req, res) => {
+
+    const db = readDB();
+
+    const booking = db.bookings.find(
+
+        b => b.id == req.params.id
+
+    );
+
+    if (!booking) {
+
+        return res.status(404).json({
+
+            success: false
+
+        });
+
+    }
+
+    booking.bookingStatus = "Cancelled";
+
+    writeDB(db);
+
+    res.json({
+
+        success: true
+
+    });
+
+});
+
+
+// Delete Booking
+
+app.delete("/api/admin/bookings/:id", isLoggedIn, (req, res) => {
+
+    const db = readDB();
+
+    db.bookings = db.bookings.filter(
+
+        b => b.id != req.params.id
+
+    );
+
+    writeDB(db);
+
+    res.json({
+
+        success: true
+
+    });
+
+});
+// ---------------------------
+// Payment API
+// ---------------------------
+
+app.post("/api/payment", (req, res) => {
+
+    const { bookingId } = req.body;
+
+    const db = readDB();
+
+    const booking = db.bookings.find(
+        b => b.id == bookingId
+    );
+
+    if (!booking) {
+
+        return res.status(404).json({
+            success: false,
+            message: "Booking Not Found"
+        });
+
+    }
+
+    booking.paymentStatus = "Paid";
+
+    booking.paymentDate = new Date().toLocaleString();
+
+    writeDB(db);
+
+    res.json({
+        success: true,
+        message: "Payment Successful",
+        booking
+    });
+
+});
+
+
+// ---------------------------
+// Booking Receipt
+// ---------------------------
+
+app.get("/api/receipt/:id", (req, res) => {
+
+    const db = readDB();
+
+    const booking = db.bookings.find(
+        b => b.id == req.params.id
+    );
+
+    if (!booking) {
+
+        return res.status(404).json({
+            success: false,
+            message: "Receipt Not Found"
+        });
+
+    }
+
+    res.json(booking);
+
+});
+
+
+// ---------------------------
+// Favourite Destinations
+// ---------------------------
+
+app.get("/api/favourites", (req, res) => {
+
+    const db = readDB();
+
+    const favourites = db.destinations.filter(
+        d => d.price <= 20000
+    );
+
+    res.json(favourites);
+
+});
+
+
+// ---------------------------
+// Add Customer Review
+// ---------------------------
+
+app.post("/api/reviews", (req, res) => {
+
+    const db = readDB();
+
+    const review = {
+
+        id: Date.now(),
+
+        name: req.body.name,
+
+        rating: Number(req.body.rating),
+
+        comment: req.body.comment
+
+    };
+
+    db.reviews.push(review);
+
+    writeDB(db);
+
+    res.json({
+        success: true,
+        review
+    });
+
+});
+
+
+// ---------------------------
+// Contact Form
+// ---------------------------
+
+app.post("/api/contact", (req, res) => {
+
+    console.log("Contact Form");
+
+    console.log(req.body);
+
+    res.json({
+
+        success: true,
+
+        message: "Thank you for contacting TravelGo."
+
+    });
+
+});
+
+
+// ---------------------------
+// Health Check
+// ---------------------------
+
+app.get("/health", (req, res) => {
+
+    res.json({
+
+        application: "TravelGo",
+
+        version: "1.0.0",
+
+        status: "Running",
+
+        serverTime: new Date()
+
+    });
+
+});
+
+
+// ---------------------------
+// 404
+// ---------------------------
 
 app.use((req, res) => {
 
@@ -415,12 +593,13 @@ app.use((req, res) => {
 
 });
 
-// -------------------------
+
+// ---------------------------
 // Start Server
-// -------------------------
+// ---------------------------
 
 app.listen(PORT, () => {
 
-    console.log(`✅ TravelGo Server Running on Port ${PORT}`);
+    console.log(`🚀 TravelGo Server Running on Port ${PORT}`);
 
 });
