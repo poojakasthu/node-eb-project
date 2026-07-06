@@ -1373,3 +1373,27 @@ gap:12px;
 }
 
 }
+
+nav button{
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+padding:10px 16px;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:15px;
+
+}
+
+nav button:hover{
+
+background:#1d4ed8;
+
+}
