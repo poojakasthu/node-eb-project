@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelGo - Travel Booking Portal</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+🌍 TravelGo
+</div>
+
+<nav>
+
+<a href="#">Home</a>
+<a href="#packages">Packages</a>
+<a href="#booking">Book Trip</a>
+<a href="#dashboard">Dashboard</a>
+
+</nav>
+
+</header>
+
+<section class="hero">
+
+<h1>Explore the World With TravelGo ✈️</h1>
+
+<p>
+Book your dream vacation in just a few clicks.
+</p>
+
+<button onclick="document.getElementById('booking').scrollIntoView()">
+Book Now
+</button>
+
+</section>
+
+<section id="packages">
+
+<h2 class="section-title">
+Popular Destinations
+</h2>
+
+<div class="card-container">
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500">
+
+<h3>Goa</h3>
+
+<p>₹8,999</p>
+
+<button onclick="selectDestination('Goa')">
+Book
+</button>
+
+</div>
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1518684079-3c830dcef090?w=500">
+
+<h3>Kerala</h3>
+
+<p>₹12,499</p>
+
+<button onclick="selectDestination('Kerala')">
+Book
+</button>
+
+</div>
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=500">
+
+<h3>Manali</h3>
+
+<p>₹10,999</p>
+
+<button onclick="selectDestination('Manali')">
+Book
+</button>
+
+</div>
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500">
+
+<h3>Dubai</h3>
+
+<p>₹54,999</p>
+
+<button onclick="selectDestination('Dubai')">
+Book
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<section id="booking">
+
+<h2 class="section-title">
+Book Your Trip
+</h2>
+
+<form id="bookingForm">
+
+<input
+type="text"
+placeholder="Full Name"
+id="name"
+required>
+
+<input
+type="text"
+placeholder="Phone Number"
+id="phone"
+required>
+
+<select id="destination">
+
+<option value="">Choose Destination</option>
+
+<option>Goa</option>
+<option>Kerala</option>
+<option>Manali</option>
+<option>Dubai</option>
+
+</select>
+
+<input
+type="number"
+placeholder="Travellers"
+id="travellers"
+min="1"
+required>
+
+<input
+type="date"
+id="travelDate"
+required>
+
+<button type="submit">
+Confirm Booking
+</button>
+
+</form>
+
+<div id="message"></div>
+
+</section>
+
+<section id="dashboard">
+
+<h2 class="section-title">
+Dashboard
+</h2>
+
+<div class="stats">
+
+<div class="stat-card">
+
+<h3 id="totalBookings">0</h3>
+
+<p>Total Bookings</p>
+
+</div>
+
+<div class="stat-card">
+
+<h3 id="confirmed">0</h3>
+
+<p>Confirmed</p>
+
+</div>
+
+<div class="stat-card">
+
+<h3 id="cancelled">0</h3>
+
+<p>Cancelled</p>
+
+</div>
+
+</div>
+
+<h2 class="section-title">
+Booking List
+</h2>
+
+<input
+type="text"
+id="search"
+placeholder="Search Customer..."
+onkeyup="searchBookings()">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Name</th>
+
+<th>Destination</th>
+
+<th>Travellers</th>
+
+<th>Date</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="bookingTable">
+
+</tbody>
+
+</table>
+
+</section>
+
+<footer>
+
+<p>
+
+© 2026 TravelGo
+
+Powered by Node.js | AWS Elastic Beanstalk
+
+</p>
+
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>
