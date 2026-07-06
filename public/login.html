@@ -17,55 +17,85 @@
 
 <div class="login-container">
 
-    <div class="login-card">
+<div class="login-card fade">
 
-        <h1>🌍 TravelGo</h1>
+<h1>🌍 TravelGo</h1>
 
-        <h2>Administrator Login</h2>
+<h2>Administrator Login</h2>
 
-        <p>Please login to continue</p>
+<p>
 
-        <form id="loginForm">
+Sign in to access the Admin Dashboard
 
-            <input
-                type="text"
-                id="username"
-                placeholder="Username"
-                required
-            >
+</p>
 
-            <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                required
-            >
+<form id="loginForm">
 
-            <button type="submit">
-                Login
-            </button>
+<input
+type="text"
+id="username"
+placeholder="Username"
+autocomplete="username"
+required
+>
 
-        </form>
+<input
+type="password"
+id="password"
+placeholder="Password"
+autocomplete="current-password"
+required
+>
 
-        <div id="loginMessage"></div>
+<button type="submit" id="loginBtn">
 
-        <div class="demo-box">
+Login
 
-            <h3>Demo Credentials</h3>
+</button>
 
-            <p><strong>Username:</strong> admin</p>
+</form>
 
-            <p><strong>Password:</strong> admin123</p>
+<div id="loginMessage"></div>
 
-        </div>
+<div class="demo-box">
 
-        <a href="/" class="back-home">
-            ← Back to Home
-        </a>
+<h3>Demo Credentials</h3>
 
-    </div>
+<p>
+
+<strong>Username :</strong> admin
+
+</p>
+
+<p>
+
+<strong>Password :</strong> admin123
+
+</p>
 
 </div>
+
+<a href="/" class="back-home">
+
+← Back to Home
+
+</a>
+
+</div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<footer>
+
+<p>
+
+© 2026 TravelGo | AWS Elastic Beanstalk
+
+</p>
+
+</footer>
 
 <script src="js/login.js"></script>
 
