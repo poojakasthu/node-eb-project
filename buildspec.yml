@@ -5,11 +5,13 @@ phases:
     runtime-versions:
       nodejs: 18
     commands:
+      - echo Installing dependencies...
       - npm install
 
   build:
     commands:
-      - echo "Build completed"
+      - echo Build started...
+      - echo Build completed successfully.
 
 artifacts:
   files:
