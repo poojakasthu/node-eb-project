@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>TravelGo Admin Dashboard</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+
+🌍 TravelGo Admin
+
+</div>
+
+<nav>
+
+<a href="/">Home</a>
+
+<a href="/logout">Logout</a>
+
+</nav>
+
+</header>
+
+<section class="dashboard-header">
+
+<h1>
+
+Welcome,
+<span id="adminName">
+Administrator
+</span>
+
+</h1>
+
+<p>
+
+Manage all travel bookings from one place.
+
+</p>
+
+</section>
+
+<section>
+
+<div class="stats">
+
+<div class="stat-card">
+
+<h2 id="totalBookings">
+
+0
+
+</h2>
+
+<p>
+
+Total Bookings
+
+</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2 id="confirmedBookings">
+
+0
+
+</h2>
+
+<p>
+
+Confirmed
+
+</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2 id="cancelledBookings">
+
+0
+
+</h2>
+
+<p>
+
+Cancelled
+
+</p>
+
+</div>
+
+<div class="stat-card">
+
+<h2>
+
+₹<span id="totalRevenue">
+
+0
+
+</span>
+
+</h2>
+
+<p>
+
+Revenue
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>
+
+Recent Bookings
+
+</h2>
+
+<input
+type="text"
+id="searchBooking"
+placeholder="Search booking..."
+onkeyup="searchBooking()">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Name</th>
+
+<th>Destination</th>
+
+<th>Phone</th>
+
+<th>Date</th>
+
+<th>Status</th>
+
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="bookingTable">
+
+</tbody>
+
+</table>
+
+</section>
+
+<footer>
+
+<p>
+
+TravelGo Admin Dashboard
+
+</p>
+
+</footer>
+
+<script src="js/dashboard.js"></script>
+
+</body>
+
+</html>
