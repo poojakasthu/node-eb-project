@@ -1,34 +1,43 @@
 {
-  "bookings": [
+  "bookings": [],
+  "reviews": [
     {
-      "id": 1001,
+      "id": 1,
       "name": "Rahul Sharma",
-      "phone": "9876543210",
-      "destination": "Goa",
-      "travellers": 2,
-      "travelDate": "2026-08-15",
-      "status": "Confirmed",
-      "createdAt": "2026-07-06 10:30 AM"
+      "rating": 5,
+      "comment": "Amazing booking experience!"
     },
     {
-      "id": 1002,
-      "name": "Priya Patel",
-      "phone": "9123456780",
-      "destination": "Kerala",
-      "travellers": 4,
-      "travelDate": "2026-09-10",
-      "status": "Confirmed",
-      "createdAt": "2026-07-06 11:15 AM"
+      "id": 2,
+      "name": "Priya Nair",
+      "rating": 4,
+      "comment": "Very smooth and easy to use."
+    }
+  ],
+  "destinations": [
+    {
+      "id": 1,
+      "name": "Goa",
+      "price": 12000,
+      "days": "3 Days / 2 Nights"
     },
     {
-      "id": 1003,
-      "name": "Arun Kumar",
-      "phone": "9988776655",
-      "destination": "Manali",
-      "travellers": 3,
-      "travelDate": "2026-10-05",
-      "status": "Confirmed",
-      "createdAt": "2026-07-06 12:00 PM"
+      "id": 2,
+      "name": "Kerala",
+      "price": 18000,
+      "days": "5 Days / 4 Nights"
+    },
+    {
+      "id": 3,
+      "name": "Manali",
+      "price": 15000,
+      "days": "4 Days / 3 Nights"
+    },
+    {
+      "id": 4,
+      "name": "Dubai",
+      "price": 55000,
+      "days": "5 Days / 4 Nights"
     }
   ]
 }
