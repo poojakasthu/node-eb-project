@@ -1,169 +1,417 @@
-// ----------------------------
-// TravelGo Frontend Script
-// ----------------------------
+// ===============================
+// TravelGo Frontend
+// ===============================
 
-// Auto load data when page opens
-window.onload = () => {
-    loadBookings();
-    loadStats();
-};
+const API = "/api";
 
-// Select destination from package cards
-function selectDestination(destination) {
-    document.getElementById("destination").value = destination;
-    document.getElementById("booking").scrollIntoView({
-        behavior: "smooth"
-    });
-}
+// ===============================
+// Page Load
+// ===============================
 
-// Booking Form Submit
-document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+document.addEventListener("DOMContentLoaded", () => {
 
-    e.preventDefault();
+    loadDestinations();
 
-    const booking = {
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        destination: document.getElementById("destination").value,
-        travellers: document.getElementById("travellers").value,
-        travelDate: document.getElementById("travelDate").value
-    };
+    loadFavouriteDestinations();
 
-    const response = await fetch("/api/bookings", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(booking)
-    });
+    loadReviews();
 
-    const result = await response.json();
+    setupBookingForm();
 
-    document.getElementById("message").innerHTML =
-        "✅ Booking Confirmed Successfully!";
-
-    document.getElementById("bookingForm").reset();
-
-    loadBookings();
-    loadStats();
+    setupContactForm();
 
 });
 
-// Load All Bookings
-async function loadBookings() {
+// ===============================
+// Load Destinations
+// ===============================
 
-    const response = await fetch("/api/bookings");
+async function loadDestinations() {
 
-    const bookings = await response.json();
+    try {
 
-    const table = document.getElementById("bookingTable");
+        const response = await fetch(`${API}/destinations`);
 
-    table.innerHTML = "";
+        const destinations = await response.json();
 
-    bookings.reverse().forEach((booking) => {
+        const container = document.getElementById("destinationContainer");
 
-        table.innerHTML += `
+        if (!container) return;
 
-        <tr>
+        container.innerHTML = "";
 
-        <td>${booking.id}</td>
+        destinations.forEach(destination => {
 
-        <td>${booking.name}</td>
+            container.innerHTML += `
 
-        <td>${booking.destination}</td>
+<div class="card fade">
 
-        <td>${booking.travellers}</td>
+<img src="https://picsum.photos/400/250?random=${destination.id}">
 
-        <td>${booking.travelDate}</td>
+<div class="card-content">
 
-        <td>
-            <span style="color:green;font-weight:bold;">
-            ${booking.status}
-            </span>
-        </td>
+<h3>${destination.name}</h3>
 
-        <td>
+<p>${destination.days}</p>
 
-        <button
-        class="delete-btn"
-        onclick="deleteBooking(${booking.id})">
+<p class="price">₹${destination.price}</p>
 
-        Delete
+<button onclick="selectDestination('${destination.name}',${destination.price})">
 
-        </button>
+Book Now
 
-        </td>
+</button>
 
-        </tr>
+</div>
 
-        `;
+</div>
 
-    });
+`;
 
-}
+        });
 
-// Delete Booking
-async function deleteBooking(id) {
+    }
 
-    const confirmDelete =
-        confirm("Delete this booking?");
+    catch(err){
 
-    if (!confirmDelete)
-        return;
+        console.error(err);
 
-    await fetch(`/api/bookings/${id}`, {
-        method: "DELETE"
-    });
-
-    loadBookings();
-    loadStats();
+    }
 
 }
 
-// Dashboard Statistics
-async function loadStats() {
+// ===============================
+// Search Destination
+// ===============================
 
-    const response = await fetch("/api/stats");
+function searchDestination(){
 
-    const stats = await response.json();
+    const value = document
+    .getElementById("searchDestination")
+    .value
+    .toLowerCase();
 
-    document.getElementById("totalBookings").innerHTML =
-        stats.totalBookings;
+    const cards = document.querySelectorAll(".card");
 
-    document.getElementById("confirmed").innerHTML =
-        stats.confirmed;
+    cards.forEach(card=>{
 
-    document.getElementById("cancelled").innerHTML =
-        stats.cancelled;
+        if(card.innerText.toLowerCase().includes(value)){
 
-}
+            card.style.display="block";
 
-// Search Booking
-function searchBookings() {
+        }
 
-    let input =
-        document.getElementById("search")
-        .value
-        .toLowerCase();
+        else{
 
-    let rows =
-        document.querySelectorAll("#bookingTable tr");
-
-    rows.forEach((row) => {
-
-        let text =
-            row.innerText.toLowerCase();
-
-        if (text.includes(input)) {
-
-            row.style.display = "";
-
-        } else {
-
-            row.style.display = "none";
+            card.style.display="none";
 
         }
 
     });
+
+}
+
+// ===============================
+// Auto Fill Booking
+// ===============================
+
+function selectDestination(name,price){
+
+    document.getElementById("destination").value=name;
+
+    document.getElementById("amount").value=price;
+
+    document.getElementById("booking")
+    .scrollIntoView({
+
+        behavior:"smooth"
+
+    });
+
+}
+
+// ===============================
+// Booking Form
+// ===============================
+
+function setupBookingForm(){
+
+    const form=document.getElementById("bookingForm");
+
+    if(!form) return;
+
+    form.addEventListener("submit",bookTrip);
+
+}
+
+async function bookTrip(e){
+
+    e.preventDefault();
+
+    const booking={
+
+        customerName:document.getElementById("customerName").value,
+
+        email:document.getElementById("email").value,
+
+        phone:document.getElementById("phone").value,
+
+        destination:document.getElementById("destination").value,
+
+        travellers:Number(document.getElementById("travellers").value),
+
+        amount:Number(document.getElementById("amount").value)
+
+    };
+
+    const response=await fetch(`${API}/bookings`,{
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+        body:JSON.stringify(booking)
+
+    });
+
+    const result=await response.json();
+
+    if(result.success){
+
+        showToast("Booking Created Successfully");
+
+        localStorage.setItem(
+
+            "bookingId",
+
+            result.booking.id
+
+        );
+
+        setTimeout(()=>{
+
+            window.location.href="/payment.html";
+
+        },1000);
+
+    }
+
+}
+
+// ===============================
+// Favourite Destinations
+// ===============================
+
+async function loadFavouriteDestinations(){
+
+    try{
+
+        const response=await fetch(`${API}/favourites`);
+
+        const data=await response.json();
+
+        const container=document.getElementById("favouriteContainer");
+
+        if(!container) return;
+
+        container.innerHTML="";
+
+        data.forEach(item=>{
+
+            container.innerHTML+=`
+
+<div class="favourite-card scale">
+
+<h3>${item.name}</h3>
+
+<p>${item.days}</p>
+
+<p class="price">
+
+₹${item.price}
+
+</p>
+
+<button onclick="selectDestination('${item.name}',${item.price})">
+
+Book
+
+</button>
+
+</div>
+
+`;
+
+        });
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+    }
+
+}
+
+// ===============================
+// Reviews
+// ===============================
+
+async function loadReviews(){
+
+    try{
+
+        const response=await fetch(`${API}/reviews`);
+
+        const reviews=await response.json();
+
+        const container=document.getElementById("reviewContainer");
+
+        if(!container) return;
+
+        container.innerHTML="";
+
+        reviews.forEach(review=>{
+
+            container.innerHTML+=`
+
+<div class="review-card fade">
+
+<h3>${review.name}</h3>
+
+<span>
+
+${"⭐".repeat(review.rating)}
+
+</span>
+
+<p>
+
+${review.comment}
+
+</p>
+
+</div>
+
+`;
+
+        });
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+    }
+
+}
+
+// ===============================
+// Contact Form
+// ===============================
+
+function setupContactForm(){
+
+    const form=document.getElementById("contactForm");
+
+    if(!form) return;
+
+    form.addEventListener("submit",sendMessage);
+
+}
+
+async function sendMessage(e){
+
+    e.preventDefault();
+
+    const body={
+
+        name:document.getElementById("contactName").value,
+
+        email:document.getElementById("contactEmail").value,
+
+        message:document.getElementById("contactMessage").value
+
+    };
+
+    await fetch(`${API}/contact`,{
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+        body:JSON.stringify(body)
+
+    });
+
+    showToast("Message Sent Successfully");
+
+    document.getElementById("contactForm").reset();
+
+}
+
+// ===============================
+// Dark Mode
+// ===============================
+
+function toggleDarkMode(){
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+
+        "darkMode",
+
+        document.body.classList.contains("dark")
+
+    );
+
+}
+
+if(localStorage.getItem("darkMode")==="true"){
+
+    document.body.classList.add("dark");
+
+}
+
+// ===============================
+// Toast
+// ===============================
+
+function showToast(message){
+
+    let toast=document.getElementById("toast");
+
+    if(!toast){
+
+        toast=document.createElement("div");
+
+        toast.id="toast";
+
+        toast.className="toast";
+
+        document.body.appendChild(toast);
+
+    }
+
+    toast.innerHTML=message;
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+
+        toast.classList.remove("show");
+
+    },3000);
 
 }
