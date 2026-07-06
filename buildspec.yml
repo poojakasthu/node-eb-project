@@ -8,10 +8,17 @@ phases:
       - echo Installing dependencies...
       - npm install
 
+  pre_build:
+    commands:
+      - echo Pre-build phase complete
+
   build:
     commands:
-      - echo Build started...
-      - echo Build completed successfully.
+      - echo No build step required for Express app
+
+  post_build:
+    commands:
+      - echo Build completed successfully
 
 artifacts:
   files:
