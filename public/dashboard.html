@@ -5,8 +5,7 @@
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>TravelGo Admin Dashboard</title>
 
@@ -28,7 +27,23 @@ content="width=device-width, initial-scale=1.0">
 
 <a href="/">Home</a>
 
-<a href="/logout">Logout</a>
+<button id="refreshBtn">
+
+🔄 Refresh
+
+</button>
+
+<button id="darkBtn">
+
+🌙 Dark Mode
+
+</button>
+
+<button id="logoutBtn">
+
+Logout
+
+</button>
 
 </nav>
 
@@ -39,15 +54,18 @@ content="width=device-width, initial-scale=1.0">
 <h1>
 
 Welcome,
+
 <span id="adminName">
+
 Administrator
+
 </span>
 
 </h1>
 
 <p>
 
-Manage all travel bookings from one place.
+Manage bookings, payments and customers.
 
 </p>
 
@@ -65,11 +83,7 @@ Manage all travel bookings from one place.
 
 </h2>
 
-<p>
-
-Total Bookings
-
-</p>
+<p>Total Bookings</p>
 
 </div>
 
@@ -81,11 +95,7 @@ Total Bookings
 
 </h2>
 
-<p>
-
-Confirmed
-
-</p>
+<p>Confirmed</p>
 
 </div>
 
@@ -97,11 +107,7 @@ Confirmed
 
 </h2>
 
-<p>
-
-Cancelled
-
-</p>
+<p>Cancelled</p>
 
 </div>
 
@@ -117,11 +123,7 @@ Cancelled
 
 </h2>
 
-<p>
-
-Revenue
-
-</p>
+<p>Total Revenue</p>
 
 </div>
 
@@ -133,15 +135,21 @@ Revenue
 
 <h2>
 
-Recent Bookings
+Booking Management
 
 </h2>
 
 <input
+
 type="text"
+
 id="searchBooking"
-placeholder="Search booking..."
-onkeyup="searchBooking()">
+
+placeholder="Search by customer, destination or phone..."
+
+onkeyup="searchBooking()"
+
+>
 
 <table>
 
@@ -151,15 +159,17 @@ onkeyup="searchBooking()">
 
 <th>ID</th>
 
-<th>Name</th>
+<th>Customer</th>
 
 <th>Destination</th>
 
 <th>Phone</th>
 
-<th>Date</th>
+<th>Payment</th>
 
 <th>Status</th>
+
+<th>Booked On</th>
 
 <th>Actions</th>
 
@@ -175,11 +185,29 @@ onkeyup="searchBooking()">
 
 </section>
 
+<section>
+
+<h2>
+
+Server Status
+
+</h2>
+
+<p id="healthStatus">
+
+Checking...
+
+</p>
+
+</section>
+
+<div id="toast" class="toast"></div>
+
 <footer>
 
 <p>
 
-TravelGo Admin Dashboard
+© 2026 TravelGo Admin Dashboard
 
 </p>
 
