@@ -1,123 +1,112 @@
-const express = require('express');
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
-app.get('/', (req, res) => {
-res.send(`
-<!DOCTYPE html>
-<html>
-<head>
-<title>Node EB Project</title>
+const PORT = process.env.PORT || 3000;
+const DB_PATH = path.join(__dirname, "data", "database.json");
 
-<style>
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
-body{
-font-family:Arial,sans-serif;
-margin:0;
-padding:0;
-background:#f4f6f9;
+function readDatabase() {
+    if (!fs.existsSync(DB_PATH)) {
+        fs.writeFileSync(
+            DB_PATH,
+            JSON.stringify({ bookings: [] }, null, 2)
+        );
+    }
+
+    return JSON.parse(fs.readFileSync(DB_PATH));
 }
 
-header{
-background:#1e3a8a;
-color:white;
-padding:20px;
-text-align:center;
+function writeDatabase(data) {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
 }
 
-.hero{
-padding:50px;
-text-align:center;
-}
+// Home Page
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-.card-container{
-display:flex;
-justify-content:center;
-gap:20px;
-margin-top:30px;
-flex-wrap:wrap;
-}
+// Get All Bookings
+app.get("/api/bookings", (req, res) => {
+    const db = readDatabase();
+    res.json(db.bookings);
+});
 
-.card{
-background:white;
-padding:20px;
-width:250px;
-border-radius:15px;
-box-shadow:0px 4px 10px rgba(0,0,0,0.2);
-}
+// Create Booking
+app.post("/api/bookings", (req, res) => {
 
-button{
-background:#2563eb;
-color:white;
-padding:12px 20px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-}
+    const db = readDatabase();
 
-footer{
-margin-top:40px;
-background:#111827;
-color:white;
-padding:15px;
-text-align:center;
-}
+    const booking = {
+        id: Date.now(),
+        name: req.body.name,
+        destination: req.body.destination,
+        travellers: req.body.travellers,
+        travelDate: req.body.travelDate,
+        phone: req.body.phone,
+        status: "Confirmed",
+        createdAt: new Date().toLocaleString()
+    };
 
-</style>
+    db.bookings.push(booking);
 
-</head>
+    writeDatabase(db);
 
-<body>
+    res.json({
+        success: true,
+        message: "Booking Successful",
+        booking
+    });
 
-<header>
-<h1>My Cloud Project Website 🚀</h1>
-<p>Deployed using AWS Elastic Beanstalk</p>
-</header>
+});
 
-<div class="hero">
+// Delete Booking
+app.delete("/api/bookings/:id", (req, res) => {
 
-<h2>Welcome</h2>
+    const db = readDatabase();
 
-<p>
-This website is built using Node.js and deployed on AWS using CI/CD pipeline.
-</p>
+    db.bookings = db.bookings.filter(
+        b => b.id != req.params.id
+    );
 
-<button onclick="alert('Project Successfully Running!')">
-Explore
-</button>
+    writeDatabase(db);
 
-<div class="card-container">
+    res.json({
+        success: true,
+        message: "Booking Deleted"
+    });
 
-<div class="card">
-<h3>Node.js</h3>
-<p>Backend runtime environment</p>
-</div>
+});
 
-<div class="card">
-<h3>AWS</h3>
-<p>Cloud deployment platform</p>
-</div>
+// Statistics
+app.get("/api/stats", (req, res) => {
 
-<div class="card">
-<h3>CI/CD</h3>
-<p>Automatic deployment workflow</p>
-</div>
+    const db = readDatabase();
 
-</div>
+    res.json({
+        totalBookings: db.bookings.length,
+        confirmed: db.bookings.filter(
+            b => b.status === "Confirmed"
+        ).length,
+        cancelled: db.bookings.filter(
+            b => b.status === "Cancelled"
+        ).length
+    });
 
-</div>
+});
 
-<footer>
-Created by Pooja ❤️
-</footer>
+// 404 Page
+app.use((req, res) => {
+    res.status(404).json({
+        error: "Page Not Found"
+    });
+});
 
-</body>
-</html>
-`)
-})
-
-const PORT = process.env.PORT || 3000
-
-app.listen(PORT,()=>{
-console.log(`Server Running on port \${PORT}`)
-})
+app.listen(PORT, () => {
+    console.log(`TravelGo Server Running on Port ${PORT}`);
+});
